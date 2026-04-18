@@ -152,6 +152,15 @@ def make_full_timeline_monthly_series(pd, df, score_cols: list[str]):
     return pd.concat(frames, ignore_index=True)
 
 
+def add_they_we_ratio(np, full_timeline):
+    if "they_gt_score" not in full_timeline.columns or "we_gt_score" not in full_timeline.columns:
+        return None
+    ratio_df = full_timeline.copy()
+    we_scores = ratio_df["we_gt_score"]
+    ratio_df["they_we_ratio"] = np.where(we_scores > 0, ratio_df["they_gt_score"] / we_scores, np.nan)
+    return ratio_df
+
+
 def main() -> int:
     args = parse_args()
     xlsx_path = args.xlsx.resolve()
@@ -239,6 +248,9 @@ def main() -> int:
 
     full_timeline = make_full_timeline_monthly_series(pd, df, score_cols)
     full_timeline.to_csv(out_dir / "full_timeline_monthly_scores.csv", index=False, encoding="utf-8-sig")
+    ratio_timeline = add_they_we_ratio(np, full_timeline)
+    if ratio_timeline is not None:
+        ratio_timeline.to_csv(out_dir / "full_timeline_they_we_ratio.csv", index=False, encoding="utf-8-sig")
 
     for score_col in score_cols:
         fig, ax = plt.subplots(figsize=(13, 5.5))
@@ -281,6 +293,47 @@ def main() -> int:
         fig.savefig(trend_dir / f"{safe_name(score_col)}__full_timeline_trend.png", dpi=200, bbox_inches="tight")
         plt.close(fig)
 
+    if ratio_timeline is not None:
+        fig, ax = plt.subplots(figsize=(13, 5.5))
+        for speaker in ["Trump", "Clinton", "Biden", "Harris"]:
+            sub = ratio_timeline[ratio_timeline["Speaker"] == speaker].copy()
+            if sub.empty:
+                continue
+            style = SPEAKER_STYLES[speaker]
+            series = sub["they_we_ratio"]
+            ma = series.rolling(window=9, center=True, min_periods=1).mean()
+            ax.plot(
+                sub["Date"],
+                series,
+                linestyle=":",
+                marker="o",
+                markersize=3,
+                linewidth=1.1,
+                color=style["color"],
+                alpha=0.75,
+                label=f"{style['label']} monthly",
+            )
+            ax.plot(
+                sub["Date"],
+                ma,
+                linestyle="-",
+                linewidth=2.0,
+                color=style["color"],
+                label=f"{style['label']} 9-mo MA",
+            )
+
+        ax.set_title("They/We Ratio | Trump vs Democratic opponents over time")
+        ax.set_xlabel("Date")
+        ax.set_ylabel("Ratio")
+        ax.grid(True, linestyle="--", alpha=0.4)
+        ax.legend(ncol=2)
+        ax.xaxis.set_major_locator(mdates.MonthLocator(interval=6))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m"))
+        fig.autofmt_xdate()
+        fig.tight_layout()
+        fig.savefig(trend_dir / "they_we_ratio__full_timeline_trend.png", dpi=200, bbox_inches="tight")
+        plt.close(fig)
+
     for score_col in score_cols:
         sub = election_year_comparison[election_year_comparison["Dictionary"] == score_col].copy()
         fig, ax = plt.subplots(figsize=(8, 5))
@@ -305,6 +358,8 @@ def main() -> int:
     print(f"wrote: {out_dir / 'election_year_mean_comparison.csv'}")
     print(f"wrote monthly CSVs to: {out_dir}")
     print(f"wrote: {out_dir / 'full_timeline_monthly_scores.csv'}")
+    if ratio_timeline is not None:
+        print(f"wrote: {out_dir / 'full_timeline_they_we_ratio.csv'}")
     print(f"wrote trend plots to: {trend_dir}")
     print(f"wrote bar charts to: {bar_dir}")
     return 0
