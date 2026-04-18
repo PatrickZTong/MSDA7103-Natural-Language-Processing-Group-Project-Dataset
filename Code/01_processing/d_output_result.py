@@ -5,7 +5,7 @@ Expected filename stem: ``{YYYY}{a-z} {Speaker} {Month}`` (same as preprocessed 
 Columns (English headers): Speaker, Year, SpeechIndex, Month, Text, SlidingWindow2gram
 (bigrams ``w_i w_{i+1}`` joined by ``;``).
 
-Writes ``processed_data_outpout.xlsx`` and ``processed_data_outpout.csv`` inside ``processed_data/`` by default.
+Writes ``processed_data_output.xlsx`` and ``processed_data_output.csv`` inside ``processed_data/`` by default.
 """
 
 from __future__ import annotations
@@ -37,8 +37,8 @@ OUTPUT_COLUMNS = [
 def parse_args() -> argparse.Namespace:
     repo_root = Path(__file__).resolve().parents[2]
     default_in = repo_root / "processed_data"
-    default_xlsx = default_in / "processed_data_outpout.xlsx"
-    default_csv = default_in / "processed_data_outpout.csv"
+    default_xlsx = default_in / "processed_data_output.xlsx"
+    default_csv = default_in / "processed_data_output.csv"
 
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument(

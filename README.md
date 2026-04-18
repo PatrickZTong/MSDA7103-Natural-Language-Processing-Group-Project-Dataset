@@ -7,13 +7,13 @@
 | 路径 | 内容 |
 |------|------|
 | **`original_ data/`** | 原始 **Word（`.docx`）** 文稿，按演讲者与时间命名；Harris 部分文件名为「年份代号 + Harris + 月份」形式。 |
-| **`processed_data/`** | 经 `c_data_preprocessing.py` 清洗后的 **纯文本（`.txt`）**，与源文件**同名主文件名**（扩展名为 `.txt`）。默认还在此目录输出汇总表 **`processed_data_outpout.xlsx`** 与 **`processed_data_outpout.csv`**（由 `d_output_result.py` 生成）。 |
-| **`Code/01_preprocessing/`** | 预处理与导出脚本（按建议顺序）：`a_rename_documents.py`（下划线改空格）、`b_standardized_naming.py`（文件名规则化）、`c_data_preprocessing.py`（正文清洗与词形还原）、`d_output_result.py`（汇总为表格）。 |
+| **`processed_data/`** | 经 `c_data_preprocessing.py` 清洗后的 **纯文本（`.txt`）**，与源文件**同名主文件名**（扩展名为 `.txt`）。默认还在此目录输出汇总表 **`processed_data_output.xlsx`** 与 **`processed_data_output.csv`**（由 `d_output_result.py` 生成）。 |
+| **`Code/`** | 代码目录。当前主要子文件夹为 **`01_processing/`**，其中包含：`a_rename_documents.py`（下划线改空格）、`b_standardized_naming.py`（文件名规则化）、`c_data_preprocessing.py`（正文清洗与词形还原）、`d_output_result.py`（汇总为表格）。 |
 | **`Literature/`** | 课程/项目相关参考文献（如 PDF）。 |
 
-> 说明：根目录下若仍有旧版 `processed_data_outpout.*`，可能是改输出路径前的遗留文件，以 **`processed_data/`** 内版本为准。
+> 说明：若目录中仍有旧版 `processed_data_outpout.*`，那是早期拼写错误留下的遗留文件；当前应以 `processed_data_output.*` 为准。
 
-## 汇总表：`processed_data_outpout.xlsx` 与 `processed_data_outpout.csv`
+## 汇总表：`processed_data_output.xlsx` 与 `processed_data_output.csv`
 
 两份表**列结构完全相同**，仅格式不同（Excel / CSV，CSV 为 UTF-8 带 BOM，便于 Excel 打开）。
 
@@ -29,7 +29,7 @@
 生成方式：在仓库根目录执行（需已安装 `pandas`、`openpyxl`）：
 
 ```bash
-python Code/01_preprocessing/d_output_result.py
+python Code/01_processing/d_output_result.py
 ```
 
-默认从 `processed_data/*.txt` 读取，并将两张表写入 **`processed_data/processed_data_outpout.xlsx`** 与 **`processed_data/processed_data_outpout.csv`**。
+默认从 `processed_data/*.txt` 读取，并将两张表写入 **`processed_data/processed_data_output.xlsx`** 与 **`processed_data/processed_data_output.csv`**。
